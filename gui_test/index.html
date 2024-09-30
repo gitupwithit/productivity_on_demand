@@ -4,47 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productivity On Demand (POD)</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .header {
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-        }
-        .icon {
-            cursor: pointer;
-            margin: 0 20px;
-        }
-        .section {
-            display: none;
-            padding: 20px;
-            border: 2px solid #007bff;
-            margin: 20px;
-            border-radius: 10px;
-        }
-        .goals-list, .challenges-list {
-            list-style: none;
-            padding: 0;
-        }
-        .goals-list li, .challenges-list li {
-            margin-bottom: 10px;
-        }
-        .slider {
-            width: 100px;
-        }
-        .go-btn {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            border-radius: 5px;
-        }
-    </style>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
@@ -52,7 +14,7 @@
     <div class="header">
         <img src="https://img.icons8.com/ios-filled/50/000000/calendar.png" alt="Calendar" class="icon" id="calendarIcon">
         <img src="https://img.icons8.com/ios-filled/50/000000/goal.png" alt="Goals" class="icon" id="goalsIcon">
-        <img src="https://img.icons8.com/ios-filled/50/000000/challenge.png" alt="Challenges" class="icon" id="challengesIcon">
+        <img src="https://img.icons8.com/ios/50/effort.png" alt="Challenges" class="icon" id="challengesIcon">
         <button class="go-btn" id="goButton">GO</button>
     </div>
 
@@ -60,6 +22,7 @@
     <div class="section" id="calendarSection">
         <h2>Calendar</h2>
         <p><a href="https://calendar.google.com" target="_blank">Open Google Calendar</a></p>
+        <p>Optional: allow app to access your Google Calendar <button id="authorizeButton">Authorize</button></p>        
     </div>
 
     <!-- Goals Section -->
@@ -93,72 +56,10 @@
         <p>Placeholder for this decade's actions</p>
     </div>
 
-    <script>
-        // JavaScript to handle UI interactions
-        const calendarIcon = document.getElementById('calendarIcon');
-        const goalsIcon = document.getElementById('goalsIcon');
-        const challengesIcon = document.getElementById('challengesIcon');
-        const goButton = document.getElementById('goButton');
-        
-        const calendarSection = document.getElementById('calendarSection');
-        const goalsSection = document.getElementById('goalsSection');
-        const challengesSection = document.getElementById('challengesSection');
-        const recommendationsSection = document.getElementById('recommendationsSection');
+    <div class="credits" id="aboutSection">
+        <p>Icons by <a href="https://icons8.com">Icons8</a></p>
+    </div>
 
-        calendarIcon.addEventListener('click', () => {
-            calendarSection.style.display = 'block';
-            goalsSection.style.display = 'none';
-            challengesSection.style.display = 'none';
-            recommendationsSection.style.display = 'none';
-        });
-
-        goalsIcon.addEventListener('click', () => {
-            goalsSection.style.display = 'block';
-            calendarSection.style.display = 'none';
-            challengesSection.style.display = 'none';
-            recommendationsSection.style.display = 'none';
-        });
-
-        challengesIcon.addEventListener('click', () => {
-            challengesSection.style.display = 'block';
-            calendarSection.style.display = 'none';
-            goalsSection.style.display = 'none';
-            recommendationsSection.style.display = 'none';
-        });
-
-        goButton.addEventListener('click', () => {
-            recommendationsSection.style.display = 'block';
-            calendarSection.style.display = 'none';
-            goalsSection.style.display = 'none';
-            challengesSection.style.display = 'none';
-        });
-
-        function addGoal() {
-            const newGoal = document.getElementById('newGoal').value;
-            if (newGoal) {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    ${newGoal} <input type="range" class="slider" min="0" max="100">
-                    <button onclick="removeGoal(this)">Remove</button>
-                `;
-                document.getElementById('goalsList').appendChild(li);
-                document.getElementById('newGoal').value = '';
-            }
-        }
-
-        function removeGoal(button) {
-            button.parentElement.remove();
-        }
-
-        function addChallenge() {
-            const newChallenge = document.getElementById('newChallenge').value;
-            if (newChallenge) {
-                const li = document.createElement('li');
-                li.textContent = newChallenge;
-                document.getElementById('challengesList').appendChild(li);
-                document.getElementById('newChallenge').value = '';
-            }
-        }
-    </script>
+    <script src="./pod_logic.js"></script>
 </body>
 </html>
