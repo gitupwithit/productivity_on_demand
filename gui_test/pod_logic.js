@@ -86,7 +86,7 @@ function handleClientLoad() {
 }
 
 function initializeGisClient() {
-    tokenClient = google.accounts.oauth2.initTokenClient({ // Uncaught ReferenceError: google is not defined
+    tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
         callback: (response) => {
@@ -95,6 +95,7 @@ function initializeGisClient() {
                 return;
             }
             accessToken = response.access_token;
+            console.log("accessToken", accessToken)
             listUpcomingEvents();
         }
     });
@@ -128,33 +129,50 @@ function updateSigninStatus(isSignedIn) {
 
 // Fetch the user's upcoming events
 function listUpcomingEvents() {
-    let fetchedEvents = []
-    if (!accessToken) {
-        console.error('Access token is missing.');
-        return;
-    }
-    gapi.client.calendar.events.list({
-        'calendarId': 'primary',
-        'timeMin': (new Date()).toISOString(),
-        'showDeleted': false,
-        'singleEvents': true,
-        'maxResults': 10,
-        'orderBy': 'startTime'
-    }).then(function (response) {
-        const events = response.result.items;
-        // console.log('Upcoming events:', events);
-        for (let eventData in events) {
-            let fetchedEventToAdd = [];
-            console.log("eventData:", events[eventData])
-            fetchedEventToAdd.summary = events[eventData].summary;
-            fetchedEventToAdd.start = events[eventData].start.dateTime;
-            fetchedEventToAdd.end = events[eventData].end.dateTime;
-            fetchedEvents.push(fetchedEventToAdd)
-        }
-        console.log(fetchedEvents)
+    // fetch primary calendar and anything family related
+    let targetCalendars = []
+    gapi.client.calendar.calendarList.list().then(function(response) {
+        const calendars = response.result.items;
+        console.log('List of calendars:', calendars);
+        calendars.forEach(calendar => {
+            console.log(`Calendar ID: ${calendar.id}, Summary: ${calendar.summary}`);
+            if (calendar.summary.toLowerCase().includes('family') || (calendar.summary.toLowerCase().includes('primary'))) {
+                console.log(calendar.id, "is primary or family related");
+                targetCalendars.push(calendar.id);
+            }
+        });
+        console.log("targetCalendars:", targetCalendars)
+        let fetchedEvents = []
+        targetCalendars.forEach(calendar => {
+            console.log("calendar:", calendar)
+            if (!accessToken) {
+                console.error('Access token is missing.');
+                return;
+            }
+            gapi.client.calendar.events.list({
+                'calendarId': calendar,
+                'timeMin': (new Date()).toISOString(),
+                'showDeleted': false,
+                'singleEvents': true,
+                'maxResults': 10,
+                'orderBy': 'startTime'
+            }).then(function (response) {
+                const events = response.result.items;
+                // console.log('Upcoming events:', events);
+                for (let eventData in events) {
+                    let fetchedEventToAdd = [];
+                    console.log("eventData:", events[eventData])
+                    fetchedEventToAdd.summary = events[eventData].summary;
+                    fetchedEventToAdd.start = events[eventData].start.dateTime;
+                    fetchedEventToAdd.end = events[eventData].end.dateTime;
+                    fetchedEvents.push(fetchedEventToAdd)
+                }
+                console.log(fetchedEvents)
 
-    }).catch(function (error) {
-        console.error('Error fetching events:', error);
-    });
+            }).catch(function (error) {
+                console.error('Error fetching events:', error);
+            });
+        })
+    })
 }
 
