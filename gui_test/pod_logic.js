@@ -128,6 +128,7 @@ function updateSigninStatus(isSignedIn) {
 
 // Fetch the user's upcoming events
 function listUpcomingEvents() {
+    let fetchedEvents = []
     if (!accessToken) {
         console.error('Access token is missing.');
         return;
@@ -141,7 +142,17 @@ function listUpcomingEvents() {
         'orderBy': 'startTime'
     }).then(function (response) {
         const events = response.result.items;
-        console.log('Upcoming events:', events);
+        // console.log('Upcoming events:', events);
+        for (let eventData in events) {
+            let fetchedEventToAdd = [];
+            console.log("eventData:", events[eventData])
+            fetchedEventToAdd.summary = events[eventData].summary;
+            fetchedEventToAdd.start = events[eventData].start.dateTime;
+            fetchedEventToAdd.end = events[eventData].end.dateTime;
+            fetchedEvents.push(fetchedEventToAdd)
+        }
+        console.log(fetchedEvents)
+
     }).catch(function (error) {
         console.error('Error fetching events:', error);
     });
